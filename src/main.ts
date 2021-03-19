@@ -10,8 +10,12 @@ async function run() {
     const github = new OctokitGitHub(input.githubToken);
     const workflows = await github.workflows(input.owner, input.repo);
     const workflow_id = workflows.find(
-      (workflow) => workflow.name == input.workflowName
+      (workflow) => {
+          core.debug(`workflow.name: ${workflow.name}`);
+          return workflow.name == input.workflowName;
+      }
     )?.id;
+    core.debug(`workflow_id: ${workflow_id}`);
     if (workflow_id) {
       await new Waiter(workflow_id, github, input, info).wait();
     }
